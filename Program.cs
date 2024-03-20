@@ -1,11 +1,14 @@
+using FluentValidation;
+using WebApi;
 using WebApi.Data;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
 builder.Services.AddDbContext<RideShareDbContext>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -18,7 +21,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.AddTripApi();
+
 app.UseRouting();
-app.MapControllers();
 
 app.Run();

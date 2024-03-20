@@ -5,11 +5,17 @@ namespace WebApi.Data;
 
 public class RideShareDbContext : DbContext
 {
-    public DbSet<Trip> Trips { get; set; }
+    private readonly IConfiguration _configuration;
+    public DbSet<Trip?> Trips { get; set; }
     public DbSet<Rating> Ratings { get; set; }
+
+    public RideShareDbContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB; Initial Catalog=RideShareDB");
+        optionsBuilder.UseMySQL(_configuration.GetConnectionString("MySQL"));
     }
 }
