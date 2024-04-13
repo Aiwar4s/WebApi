@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Data;
 
@@ -10,9 +11,11 @@ using WebApi.Data;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(RideShareDbContext))]
-    partial class RideShareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240406183859_trip seats")]
+    partial class tripseats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,34 +217,6 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WebApi.Data.Entities.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("TripId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TripId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Messages");
-                });
-
             modelBuilder.Entity("WebApi.Data.Entities.Rating", b =>
                 {
                     b.Property<int>("Id")
@@ -311,31 +286,6 @@ namespace WebApi.Migrations
                     b.ToTable("Trips");
                 });
 
-            modelBuilder.Entity("WebApi.Data.Entities.UserTrip", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("Seats")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TripId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TripId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserTrips");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -387,23 +337,6 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApi.Data.Entities.Message", b =>
-                {
-                    b.HasOne("WebApi.Data.Entities.Trip", "Trip")
-                        .WithMany()
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApi.Auth.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Trip");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebApi.Data.Entities.Rating", b =>
                 {
                     b.HasOne("WebApi.Data.Entities.Trip", "Trip")
@@ -432,35 +365,6 @@ namespace WebApi.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApi.Data.Entities.UserTrip", b =>
-                {
-                    b.HasOne("WebApi.Data.Entities.Trip", "Trip")
-                        .WithMany("UserTrips")
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApi.Auth.Entity.User", "User")
-                        .WithMany("UserTrips")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Trip");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApi.Auth.Entity.User", b =>
-                {
-                    b.Navigation("UserTrips");
-                });
-
-            modelBuilder.Entity("WebApi.Data.Entities.Trip", b =>
-                {
-                    b.Navigation("UserTrips");
                 });
 #pragma warning restore 612, 618
         }

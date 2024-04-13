@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using O9d.AspNet.FluentValidation;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 using WebApi.Data;
 using WebApi.Data.Dtos.Rating;
 using WebApi.Data.Entities;
 
-namespace WebApi;
+namespace WebApi.Endpoints;
 
 public static class RatingEndpoints
 {
@@ -31,12 +33,13 @@ public static class RatingEndpoints
             return Results.Ok(mapper.Map<RatingDto>(rating));
         }).WithName("GetRating");
 
-        routesGroup.MapPost("", async (RideShareDbContext dbContext, IMapper mapper, int tripId, [Validate] CreateRatingDto ratingDto) =>
+        routesGroup.MapPost("", async (RideShareDbContext dbContext, IMapper mapper, int tripId, [Validate] CreateRatingDto ratingDto, HttpContext httpContext) =>
         {
             Trip? trip = await dbContext.Trips.FindAsync(tripId);
             if (trip is null) return Results.NotFound();
 
             Rating rating = mapper.Map<Rating>(ratingDto);
+            rating.UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
             rating.Trip = trip;
             dbContext.Ratings.Add(rating);
             await dbContext.SaveChangesAsync();

@@ -1,4 +1,7 @@
-﻿namespace WebApi.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using WebApi.Auth.Entity;
+
+namespace WebApi.Data.Entities;
 
 public class Trip
 {
@@ -8,5 +11,13 @@ public class Trip
     public string Description { get; set; }
     public DateTime Date { get; set; }
     public int Seats { get; set; }
+    public int SeatsTaken { get; set; }
     public decimal Price { get; set; }
+
+    [Required]
+    public required string UserId { get; set; }
+
+    public User User { get; set; }
+
+    public ICollection<UserTrip> UserTrips { get; set; }
 }
