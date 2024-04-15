@@ -17,9 +17,19 @@ public static class TripEndpoints
     {
         RouteGroupBuilder tripsGroup = app.MapGroup("/api/trips").WithValidationFilter().WithTags("Trips");
 
-        tripsGroup.MapGet("", async (RideShareDbContext dbContext, IMapper mapper) =>
+        tripsGroup.MapGet("", async (RideShareDbContext dbContext, IMapper mapper, HttpContext httpContext) =>
         {
-            return Results.Ok((await dbContext.Trips.ToListAsync()).Select(x => mapper.Map<TripDto>(x)));
+            List<Trip> trips;
+            if (httpContext.User.IsInRole(UserRoles.Admin))
+            {
+                trips = await dbContext.Trips.OrderBy(t => t.Date).ToListAsync();
+            }
+            else
+            {
+                trips = await dbContext.Trips.Where(t => t.Date > DateTime.Now).OrderBy(t => t.Date).ToListAsync();
+            }
+
+            return Results.Ok(trips.Select(mapper.Map<TripDto>));
         }).WithName("GetAllTrips");
 
         tripsGroup.MapGet("{id}", async (RideShareDbContext dbContext, IMapper mapper, int id) =>
@@ -94,17 +104,19 @@ public static class TripEndpoints
             return Results.NoContent();
         }).WithName("DeleteTrip");
 
-        tripsGroup.MapDelete("{tripId}/leave", [Authorize(Roles = UserRoles.BasicUser)] async (RideShareDbContext dbContext, int tripId, HttpContext httpContext) =>
+        tripsGroup.MapDelete("{tripId}/leave", [Authorize(Roles = UserRoles.BasicUser)] async (RideShareDbContext dbContext, IMapper mapper, int tripId, HttpContext httpContext) =>
         {
             User? user = await dbContext.Users.FindAsync(httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub));
-            Trip? trip = await dbContext.Trips.Include(t => t.UserTrips).FirstOrDefaultAsync(t => t.Id == tripId);
+            Trip? trip = await dbContext.Trips
+                                        .Include(t => t.User).Include(t => t.UserTrips).FirstOrDefaultAsync(t => t.Id == tripId);
             if (user == null || trip == null)
             {
                 return Results.NotFound();
             }
 
             UserTrip? userTrip = trip.UserTrips.FirstOrDefault(ut => ut.UserId == user.Id);
-            if (userTrip == null || trip.Date < DateTime.Now)
+            // if (userTrip == null || trip.Date < DateTime.Now)
+            if (userTrip == null)
             {
                 return Results.Forbid();
             }
@@ -112,7 +124,7 @@ public static class TripEndpoints
             trip.SeatsTaken -= userTrip.Seats;
             dbContext.UserTrips.Remove(userTrip);
             await dbContext.SaveChangesAsync();
-            return Results.NoContent();
+            return Results.Ok(mapper.Map<ViewTripDto>(trip));
         }).WithName("LeaveTrip");
     }
 }

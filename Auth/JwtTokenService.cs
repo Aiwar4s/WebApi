@@ -12,14 +12,14 @@ public class JwtTokenService
     private readonly SymmetricSecurityKey _authSigningKey;
     private readonly string _issuer;
     private readonly string _audience;
-    
+
     public JwtTokenService(IConfiguration configuration)
     {
         _authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!));
         _issuer = configuration["Jwt:ValidIssuer"]!;
         _audience = configuration["Jwt:ValidAudience"]!;
     }
-    
+
     [SuppressMessage("ReSharper", "ArgumentsStyleNamedExpression")]
     public string CreateAccessToken(User user, IEnumerable<string> roles)
     {

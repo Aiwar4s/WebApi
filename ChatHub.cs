@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Auth.Entity;
 using WebApi.Data;
 using WebApi.Data.Dtos.Chat;
@@ -36,16 +37,16 @@ public class ChatHub : Hub
 
     public async Task SendMessage(int tripId, string content)
     {
-        string? userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string? userId = Context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         User? user = await _userManager.FindByIdAsync(userId);
-        Trip? trip = await _dbContext.Trips.FindAsync(tripId);
+        Trip? trip = await _dbContext.Trips.Include(t => t.UserTrips).Include(t => t.User).FirstOrDefaultAsync(t => t.Id == tripId);
 
         if (user == null || trip == null)
         {
             throw new HubException("User or trip not found");
         }
 
-        if (trip.UserTrips.All(x => x.UserId != user.Id))
+        if (trip.User.Id != user.Id && trip.UserTrips.All(x => x.UserId != user.Id))
         {
             throw new HubException("User is not part of the trip");
         }
