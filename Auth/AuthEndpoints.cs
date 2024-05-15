@@ -76,7 +76,7 @@ public static class AuthEndpoints
             user.RefreshToken = refreshToken;
             await userManager.UpdateAsync(user);
 
-            return Results.Ok(new SuccessfulLoginDto(accessToken, refreshToken));
+            return Results.Ok(new SuccessfulLoginDto(accessToken, user.RefreshToken));
         }).WithName("RefreshAccessToken");
 
         authGroup.MapPost("logout", async (UserManager<User> userManager, [Validate] LogoutDto logoutDto) =>

@@ -7,7 +7,7 @@ public class AuthDbSeeder
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    
+
     public AuthDbSeeder(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
@@ -42,7 +42,7 @@ public class AuthDbSeeder
         User? existingAdminUser = await _userManager.FindByNameAsync(newAdminUser.UserName);
         if (existingAdminUser == null)
         {
-            IdentityResult createAdminUserResult = await _userManager.CreateAsync(newAdminUser, "AdminPassword1?");
+            IdentityResult createAdminUserResult = await _userManager.CreateAsync(newAdminUser, "Admin.123");
             if (createAdminUserResult.Succeeded)
             {
                 await _userManager.AddToRolesAsync(newAdminUser, UserRoles.All);

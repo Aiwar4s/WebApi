@@ -1,3 +1,5 @@
-﻿namespace WebApi.Data.Dtos.Rating;
+﻿using WebApi.Data.Dtos.Auth;
 
-public record RatingDto(int Id, int Stars, string? Comment);
+namespace WebApi.Data.Dtos.Rating;
+
+public record RatingDto(int Id, int Stars, string? Comment, UserDto User, UserDto RatedUser, DateTime CreatedAt);

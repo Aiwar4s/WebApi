@@ -22,4 +22,21 @@ public class RideShareDbContext : IdentityDbContext<User>
     {
         optionsBuilder.UseMySQL(_configuration.GetConnectionString("MySQL"));
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Rating>()
+                    .HasOne(r => r.RatingUser)
+                    .WithMany()
+                    .HasForeignKey(r => r.RatingUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Rating>()
+                    .HasOne(r => r.RatedUser)
+                    .WithMany(u => u.Ratings)
+                    .HasForeignKey(r => r.RatedUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+    }
 }

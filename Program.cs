@@ -91,6 +91,7 @@ app.AddAuthApi();
 app.AddTripApi();
 app.AddRatingApi();
 app.AddChatApi();
+app.AddProfileApi();
 
 app.MapHub<ChatHub>("/chathub");
 
@@ -108,3 +109,7 @@ AuthDbSeeder dbSeeder = scope.ServiceProvider.GetRequiredService<AuthDbSeeder>()
 await dbSeeder.SeedAsync();
 
 app.Run("https://*:7040");
+
+public partial class Program
+{
+}

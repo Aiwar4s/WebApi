@@ -15,11 +15,14 @@ public class MapperProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<UserTrip, UserTripDto>();
 
-        CreateMap<Trip, TripDto>();
+        CreateMap<Trip, TripDto>()
+            .ForCtorParam("DriverRating", opt => opt.MapFrom(t => t.User.AverageRating));
         CreateMap<CreateTripDto, Trip>();
         CreateMap<Trip, ViewTripDto>();
 
-        CreateMap<Rating, RatingDto>();
+        CreateMap<Rating, RatingDto>()
+            .ForCtorParam(nameof(RatingDto.RatedUser), opt => opt.MapFrom(r => r.RatedUser))
+            .ForCtorParam(nameof(RatingDto.User), opt => opt.MapFrom(r => r.RatingUser));
         CreateMap<CreateRatingDto, Rating>();
 
         CreateMap<Message, MessageDto>();
